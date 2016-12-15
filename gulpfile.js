@@ -129,7 +129,7 @@ gulp.task('primus', function() {
     var Emitter = require('primus-emitter');
     var primus = Primus.createServer(function connection(spark) {
 
-    }, { port: 3000, transformer: 'websockets'  });    
+    }, { port: 3000, transformer: 'websockets'  });
     primus.use('emitter', Emitter);
     var str = primus.library();
     return file('primus.js', str, { src: true  }).pipe(gulp.dest('lib'));
