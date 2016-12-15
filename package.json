@@ -39,7 +39,7 @@
     "feathers-memory": "^0.3.4",
     "feathers-passport": "git+https://github.com/ListnPlay/feathers-passport.git",
     "gulp": "^3.9.1",
-    "isomorphic-fetch": "^2.0.1",
+    "isomorphic-fetch": "^2.2.1",
     "json": "^9.0.3",
     "nunjucks": "^3.0.0",
     "page": "^1.6.2",
