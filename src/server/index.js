@@ -1,12 +1,13 @@
 'use strict';
 
+import fs from 'fs';
 import path from 'path';
 
 import _ from 'underscore';
 import bodyParser from 'body-parser';
 import feathers from 'feathers';
 import feathersPassport from 'feathers-passport';
-import FS from 'fs';
+import nunjucks from 'nunjucks';
 import hooks from 'feathers-hooks';
 import riot from 'riot';
 import session from 'express-session';
@@ -22,25 +23,29 @@ let app = feathers();
 
 app.use(feathers.static(path.join(process.env.APP_BASE_PATH, 'public')));
 
+let nunjucksEnv = nunjucks.configure({
+  autoescape: false
+});
+
 // Riot app template engine.
 app.engine('html', (filePath, options, callback) => {
   async function render () {
-    try {
-      let view = riot.render(options.mainTag, options.tagOpts);
-      let regex = new RegExp('<' + options.mainTag + '.*<\/' + options.mainTag + '>');
-      // Loading HTML file
-      let content = await Q.denodeify(FS.readFile)(filePath);
-      let rendered = content.toString().replace(regex, view);
-      return callback(null, rendered);
-    } catch (e) {
-      console.warn('App engine error:', e, ' Filepath:', filePath, 'Callback:', callback);
-      console.warn(e.stack);
-      return;
-    }
+    let view = riot.render(options.mainTag, options.tagOpts);
+
+    // Loading Nunjucks template (HTML) file.
+    let rendered = nunjucksEnv.render(filePath, {main: view}, (err, res) => {
+      if (err) {
+        console.warn('App engine error:', err, ' Filepath:', filePath, 'Callback:', callback);
+        console.warn(err.stack);
+        return callback(err);
+      }
+
+      callback(null, res);
+    });
   }
 
   render();
-})
+});
 
 app.set('views', './build/'); // specify the views directory
 app.set('view engine', 'html'); // register the template engine
@@ -78,21 +83,27 @@ services.users.createTestUser(userService);
 services.users.setupPassport(userService, app);
 
 app.use(function (req, res, next) {
-
   let rendered = false;
   let waitBeforeRendering = [];
+
   if (req.waitBeforeRendering) {
-    // Create a copy
+    // Create a copy.
     waitBeforeRendering = req.waitBeforeRendering.slice();
   }
 
-   function renderTest() {
-    if (!rendered && waitBeforeRendering.length == 0) {
+  function renderTest () {
+    if (!rendered && !waitBeforeRendering.length) {
       rendered = true;
-      res.render('index', {mainTag: 'main', tagOpts: {'dispatcher': req.dispatcher}});
+      res.render('index', {
+        mainTag: 'main',
+        tagOpts: {
+          dispatcher: req.dispatcher
+        }
+      });
     }
   }
-  // Subscribe to all events
+
+  // Subscribe to all events.
   if (req.waitBeforeRendering) {
     req.waitBeforeRendering.forEach((eventName) => {
       req.dispatcher.one(eventName, () => {
@@ -101,6 +112,7 @@ app.use(function (req, res, next) {
       });
     });
   }
+
   renderTest();
 });
 
