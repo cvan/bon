@@ -55,6 +55,7 @@
   },
   "scripts": {
     "start": "npm run dev",
-    "dev": "gulp"
+    "dev": "NODE_ENVIRONMENT='development' gulp",
+    "prod": "NODE_ENVIRONMENT='production' gulp"
   }
 }

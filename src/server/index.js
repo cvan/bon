@@ -20,20 +20,30 @@ import settings from '../../settings.js';
 import socketUtil from '../app/util/socket';
 
 let app = feathers();
-
-app.use(feathers.static(path.join(process.env.APP_BASE_PATH, 'public')));
-
+let isProd = process.env.NODE_ENVIRONMENT === 'production';
 let nunjucksEnv = nunjucks.configure({
   autoescape: false
 });
+let protocol = (
+  settings.protocol === 'http:' ||
+  settings.protocol === 'https:' ?
+  settings.protocol : 'http:'
+);
+
+app.use(feathers.static(path.join(process.env.APP_BASE_PATH, 'public')));
 
 // Riot app template engine.
 app.engine('html', (filePath, options, callback) => {
   async function render () {
     let view = riot.render(options.mainTag, options.tagOpts);
 
+    let scriptsBody = isProd ? '' : `<script src="${protocol}://localhost:35729/livereload.js"></script>`;
+
     // Loading Nunjucks template (HTML) file.
-    let rendered = nunjucksEnv.render(filePath, {main: view}, (err, res) => {
+    let rendered = nunjucksEnv.render(filePath, {
+      main: view,
+      scripts_body: scriptsBody
+    }, (err, res) => {
       if (err) {
         console.warn('App engine error:', err, ' Filepath:', filePath, 'Callback:', callback);
         console.warn(err.stack);
@@ -123,11 +133,6 @@ let server = app.listen(settings.port, () => {
   let hostname = server.address().address;
   let port = server.address().port;
 
-  let protocol = (
-    settings.protocol === 'http:' ||
-    settings.protocol === 'https:' ?
-    settings.protocol : 'http:'
-  );
   let host = hostname === '::' ? 'localhost' : hostname;
 
   console.log('App listening at %s//%s:%s',  protocol, host, port);

@@ -8,7 +8,9 @@
     <script src="/build/client/bundle.js" async defer></script>
   </head>
   <body>
-    <script src="http://localhost:35729/livereload.js"></script>
     {{ main }}
+    {% block scripts_body %}
+      {{ scripts_body }}
+    {% endblock %}
   </body>
 </html>
