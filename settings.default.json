@@ -1,5 +1,18 @@
 {
   "protocol": "http:",
   "hostname": "localhost",
-  "port": "3000"
+  "port": "3000",
+  "firebase": {
+    "credentials": {
+      "apiKey": "AIzaSyCfMvL2DsldNeLy3LMC6gFrMD_HAFOLT-M",
+      "authDomain": "webvr-6345b.firebaseapp.com",
+      "databaseURL": "https://webvr-6345b.firebaseio.com",
+      "storageBucket": "webvr-6345b.appspot.com",
+      "messagingSenderId": "68964061906"
+    },
+    "refs": {
+      "root": "webvrrocks",
+      "showcase": "webvrrocks/webvr_scenes"
+    }
+  }
 }

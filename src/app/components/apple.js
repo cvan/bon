@@ -39,7 +39,7 @@ componentFactory.createComponent('apple', `
 
   this.data = this.stores.fruit.fruitData;
 
-  this.dispatcher.on('fruit_data_updated', () => {
+  this.dispatcher.on('db_changed', () => {
     this.data = this.stores.fruit.fruitData;
     this.update();
   });

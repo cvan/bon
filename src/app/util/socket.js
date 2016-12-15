@@ -59,6 +59,6 @@ class SocketUtil {
   }
 }
 
-// Singleton
+// Singleton.
 let instance = new SocketUtil();
 export default instance;

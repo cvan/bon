@@ -28,8 +28,13 @@ settings.baseUrl = urllib.format({
   pathname: settings.pathname
 });
 
-settings.url = path => {
-  return urllib.resolve(settings.baseUrl, path);
+settings.url = urlPath => {
+  return urllib.resolve(settings.baseUrl, urlPath);
+};
+
+settings.firebaseJSONUrl = firebaseRefName => {
+  var fn = (settings.firebase.refs[refname] || settings.firebase.refs.root) + '.json';
+  return urllib.resolve(settings.firebase.credentials.databaseURL, fn);
 };
 
 module.exports = settings;

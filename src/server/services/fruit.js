@@ -1,16 +1,14 @@
+import fetchUtil from '../../app/util/fetch';
+
 const fruitService = {
-  get: fruitName => {
+  get: tableName => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        console.log('Fruit Service --> Get fruit:', fruitName);
-        if (fruitName === 'apple') {
-          resolve({
-            types: ['Pink Lady', 'Gala', 'Fuji', 'Granny Smith']
-          });
-        } else if (fruitName === 'banana') {
-          resolve({
-            types: ['Cavendish', 'Lady Finger', 'Pisang Raja', 'Williams']
-          });
+        console.log('Fruit Service --> Get fruit:', tableName);
+        if (tableName === 'showcase') {
+          let get = await fetchUtil.getJSON(settings.firebaseJSONUrl(tableName));
+          let response = await get.json();
+          resolve(response);
         } else {
           reject('Unknown type of fruit');
         }

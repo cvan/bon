@@ -1,5 +1,6 @@
 'use strict';
 
+import settings from '../../../settings';
 import socketUtil from '../util/socket';
 import Store from './store';
 
@@ -9,26 +10,33 @@ export default class FruitStore extends Store {
     console.log('Init FruitStore');
 
     this.state = 'mall';
-    this.currentFruit = null;
+    this.currentTable = null;
 
-    this.on('fruit_swap', async (fruit) => {
+    this.on('table_changed', async (tableName) => {
       try {
-        this.currentFruit = fruit;
+        this.currentTable = tableName;
         this.trigger('fruit_updated');
 
         this.fruitData = null;
 
-        if (fruit) {
+        if (tableName) {
           // Get fruit types
-          console.log('Getting info for ', fruit);
-          // let response = await fetch('http://localhost:3000/fruit/' + fruit);
+          console.log('Getting info for ', tableName);
+          // var firebaseApp = firebase.initializeApp(settings.firebase.credentials);
+
+          // var firebaseApp = firebase.initializeApp(settings.firebase.credentials);
+          // var firebaseRef = firebaseApp.database().ref(settings.firebase.ref);
+          // console.log('firebase', firebaseRef);
+
+          // let response = await fetch(settings.firebase.credentials.databaseURL + '/' + settings.firebase.refs.showcase + '.json');
           // this.fruitData = await response.json();
-          this.fruitData = await socketUtil.rpc('fruit::get', fruit);
+
+          this.fruitData = await socketUtil.rpc('fruit::get', tableName);
           console.log('Fruit data:', this.fruitData);
-          this.trigger('fruit_data_updated');
+          this.trigger('db_changed');
         }
-      } catch (e) {
-        console.log('Error getting fruit data:', e);
+      } catch (err) {
+        console.log('Error getting fruit data:', err);
       }
     });
 

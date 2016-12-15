@@ -48,27 +48,16 @@ class Routes {
     app.route('/').get((req, res, next) => {
       console.log('Default route!');
       let dispatcher = this.getDispatcher(req);
-      dispatcher.trigger('fruit_swap', null);
+      dispatcher.trigger('table_changed', null);
 
       this.go(next, req);
     });
 
-    app.route('/apple').get((req, res, next) => {
-      this.waitBeforeRendering(req, ['fruit_data_updated']);
+    app.route('/showcase').get((req, res, next) => {
+      this.waitBeforeRendering(req, ['db_changed']);
 
       let dispatcher = this.getDispatcher(req);
-      dispatcher.trigger('fruit_swap', 'apple');
-
-      this.go(next, req);
-    });
-
-    app.route('/banana').get((req, res, next) => {
-      this.waitBeforeRendering(req, ['fruit_data_updated']);
-
-      console.log('Triggering banana fruit_swap');
-
-      let dispatcher = this.getDispatcher(req);
-      dispatcher.trigger('fruit_swap', 'banana');
+      dispatcher.trigger('table_changed', 'webvr_scenes');
 
       this.go(next, req);
     });
