@@ -1,6 +1,4 @@
-'use strict'
-
-import riot from 'riot';
+'use strict';
 
 import fetchUtil from '../util/fetch';
 import settings from '../../../settings';
@@ -24,7 +22,10 @@ export default class AuthStore extends Store {
 
         if (response.status === 'error') {
           this.trigger('login_error', response.message);
-        } else if (response.status == 'success') {
+          return;
+        }
+
+        if (response.status === 'success') {
           this.user = response.data.user;
           // Reconnect the socket to gain session auth.
           socketUtil.reconnect();
@@ -35,4 +36,4 @@ export default class AuthStore extends Store {
       }
     });
   }
-};
+}

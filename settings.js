@@ -1,12 +1,11 @@
 'use strict';
 
-import path from 'path';
-import fs from 'fs';
-import urllib from 'url';
+const path = require('path');
+const urllib = require('url');
 
-import objectAssign from 'deep-assign';
+const objectAssign = require('deep-assign');
 
-import settingsDefault from './settings.default';
+const settingsDefault = require('./settings.default');
 
 let settingsLocal = {};
 
@@ -33,4 +32,4 @@ settings.url = path => {
   return urllib.resolve(settings.baseUrl, path);
 };
 
-export default settings;
+module.exports = settings;

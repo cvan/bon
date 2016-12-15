@@ -1,7 +1,9 @@
 'use strict';
 
-import fs from 'fs';
 import path from 'path';
+
+import es6Promise from 'es6-promise';
+es6Promise.polyfill();
 
 import _ from 'underscore';
 import bodyParser from 'body-parser';
@@ -11,9 +13,8 @@ import nunjucks from 'nunjucks';
 import hooks from 'feathers-hooks';
 import riot from 'riot';
 import session from 'express-session';
-import Q from 'q';
 
-import main from '../app/components/main';
+import main from '../app/components/main';  // eslint-disable-line
 import routes from '../app/routes';
 import services from './services';
 import settings from '../../settings.js';
@@ -24,13 +25,14 @@ let isProd = process.env.NODE_ENVIRONMENT === 'production';
 let nunjucksEnv = nunjucks.configure({
   autoescape: false
 });
-let protocol = (
-  settings.protocol === 'http:' ||
-  settings.protocol === 'https:' ?
-  settings.protocol : 'http:'
-);
+let protocol = settings.protocol === 'http:' || settings.protocol === 'https:' ? settings.protocol : 'http:';
 
-app.use(feathers.static(path.join(process.env.APP_BASE_PATH, 'public')));
+let APP_BASE_PATH = process.env.APP_BASE_PATH;
+if (!APP_BASE_PATH) {
+  APP_BASE_PATH = path.resolve(__dirname, '../..');
+}
+
+app.use(feathers.static(path.join(APP_BASE_PATH, 'public')));
 
 // Riot app template engine.
 app.engine('html', (filePath, options, callback) => {
@@ -40,7 +42,7 @@ app.engine('html', (filePath, options, callback) => {
     let scriptsBody = isProd ? '' : `<script src="${protocol}://localhost:35729/livereload.js"></script>`;
 
     // Loading Nunjucks template (HTML) file.
-    let rendered = nunjucksEnv.render(filePath, {
+    nunjucksEnv.render(filePath, {
       main: view,
       scripts_body: scriptsBody
     }, (err, res) => {
@@ -60,32 +62,28 @@ app.engine('html', (filePath, options, callback) => {
 app.set('views', './build/'); // specify the views directory
 app.set('view engine', 'html'); // register the template engine
 
-// Server routes
-app.configure(
-  feathers.rest()
-)
-.configure(feathers.primus({
-  transformer: 'websockets'
+// Server routes.
+app.configure(feathers.rest())
+  .configure(feathers.primus({
+    transformer: 'websockets'
+  }, function (primus) {}))
+  .configure(hooks())
+  .use(bodyParser.json())
+  .configure(feathersPassport({
+    secret: 'eat-your-fruits',
+    // In production, use `session.RedisStore()`.
+    store: new session.MemoryStore(),
+    resave: true,
+    saveUninitialized: true
+  }))
+  .use('/fruit', services.fruit)
+  .use('/taste', services.taste)
+  .use('/users', services.users);
 
-}, function(primus) {
-}))
-.configure(hooks())
-.use(bodyParser.json())
-.configure(feathersPassport({
-  secret: 'eat-your-fruits',
-  // In production use RedisStore
-  store: new session.MemoryStore(),
-  resave: true,
-  saveUninitialized: true
-}))
-.use('/fruit', services.fruit)
-.use('/taste', services.taste)
-.use('/users', services.users);
-
-// Client routes
+// Client routes.
 routes.runRoutingTable(app);
 
-// Authentication setup
+// Authentication setup.
 let userService = app.service('users');
 
 services.users.insertHooks(userService);
@@ -128,14 +126,14 @@ app.use(function (req, res, next) {
 
 console.log('Starting server');
 
-// Server routes
+// Server routes.
 let server = app.listen(settings.port, () => {
   let hostname = server.address().address;
   let port = server.address().port;
 
   let host = hostname === '::' ? 'localhost' : hostname;
 
-  console.log('App listening at %s//%s:%s',  protocol, host, port);
+  console.log('App listening at %s//%s:%s', protocol, host, port);
 
   // Init the loopback socket connection.
   socketUtil.initWithUrl(settings.baseUrl);

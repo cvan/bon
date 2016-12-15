@@ -1,5 +1,7 @@
-// Socket Util
-// Users primus.js
+/* global Primus */
+
+// Socket Util.
+// Users primus.js.
 
 import PrimusNode from 'primus';
 import PrimusEmitter from 'primus-emitter';
@@ -7,9 +9,6 @@ import PrimusEmitter from 'primus-emitter';
 import settings from '../../../settings';
 
 class SocketUtil {
-  constructor () {
-  }
-
   initWithUrl (url) {
     this.url = url;
     this.client = null;
@@ -21,12 +20,12 @@ class SocketUtil {
         transformer: 'websockets',
         parser: 'json',
         plugin: {
-          'emitter' : PrimusEmitter
+          emitter: PrimusEmitter
         }
       });
       this.client = new Socket(url);
     } else {
-      // Client init
+      // Client init.
       console.log('Socket util - Client init with URL:', url);
       this.client = Primus.connect(settings.baseUrl);
     }
@@ -34,8 +33,9 @@ class SocketUtil {
     this.client.on('open', () => {
       console.log('Socket connection is open');
     });
+
     this.client.on('error', (error) => {
-      console.log('Error connecting to socket:', error);
+      console.warn('Error connecting to socket:', error);
     });
   }
 
@@ -47,16 +47,17 @@ class SocketUtil {
   rpc (service, args) {
     return new Promise((resolve, reject) => {
       console.log('Socket util sending', args, 'to', service);
-      this.client.send(service,args, (error, result) => {
+
+      this.client.send(service, args, (error, result) => {
         if (error) {
-          reject(error)
+          reject(error);
         } else {
           resolve(result);
         }
       });
     });
   }
-};
+}
 
 // Singleton
 let instance = new SocketUtil();

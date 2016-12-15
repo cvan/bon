@@ -3,6 +3,9 @@ import fetch_ from 'isomorphic-fetch';
 
 class FetchUtil {
   constructor () {
+    // This solves an invocation error problem in Chrome
+    // (according to https://github.com/matthew-andrews/isomorphic-fetch/pull/20).
+    this.fetch = fetch_.bind(undefined);
   }
 
   postJSON (target, data) {
@@ -26,7 +29,7 @@ class FetchUtil {
       }
     });
   }
-};
+}
 
 // Singleton.
 let instance = new FetchUtil();

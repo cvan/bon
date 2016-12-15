@@ -1,9 +1,7 @@
-import riot from 'riot';
 import componentFactory from '../component-factory';
 
-import accountStatus from './account-status';
-import mall from './mall';
-import login from './login';
+import mall from './mall';  // eslint-disable-line
+import login from './login';  // eslint-disable-line
 
 componentFactory.createComponent('main', `
 
@@ -12,19 +10,18 @@ componentFactory.createComponent('main', `
 <login if={stores.main.state=='login'}></login>
 
 <style>
-    main {
-        display: block;
-        background-color: pink;
-    }
+  main {
+    display: block;
+    background-color: pink;
+  }
 </style>
- 
- `,
- function(opts) {
-    this.on('mount', () => {
-        console.log("Main mounted");
-    });
 
-    this.dispatcher.on('main_state_updated', () => {
-        this.update();
-    });
+`, function (opts) {
+  this.on('mount', () => {
+    console.log('Main mounted');
+  });
+
+  this.dispatcher.on('main_state_updated', () => {
+    this.update();
+  });
 });

@@ -1,17 +1,14 @@
-'use strict'
-
-import riot from 'riot';
-import fetch from 'isomorphic-fetch';
+'use strict';
 
 import socketUtil from '../util/socket';
 import Store from './store';
 
 export default class FruitStore extends Store {
-  constructor() {
+  constructor () {
     super();
     console.log('Init FruitStore');
 
-    this.state='mall';
+    this.state = 'mall';
     this.currentFruit = null;
 
     this.on('fruit_swap', async (fruit) => {
@@ -24,10 +21,10 @@ export default class FruitStore extends Store {
         if (fruit) {
           // Get fruit types
           console.log('Getting info for ', fruit);
-          /* let response = await fetch('http://localhost:3000/fruit/' + fruit);
-             this.fruitData = await response.json();*/
+          // let response = await fetch('http://localhost:3000/fruit/' + fruit);
+          // this.fruitData = await response.json();
           this.fruitData = await socketUtil.rpc('fruit::get', fruit);
-          console.log('Fruit data: ',this.fruitData);
+          console.log('Fruit data:', this.fruitData);
           this.trigger('fruit_data_updated');
         }
       } catch (e) {
@@ -42,11 +39,10 @@ export default class FruitStore extends Store {
           type: type,
           result: result.result
         });
-      }
-      catch (error) {
-        console.log('Taste fruit error:', error);
-        this.trigger('taste_error', {message: error});
+      } catch (err) {
+        console.log('Taste fruit error:', err);
+        this.trigger('taste_error', {message: err});
       }
     });
   }
-};
+}

@@ -1,7 +1,7 @@
-// Babel ES6
-require("babel/register")({
-    stage: 1
+// Babel ES6.
+require('babel/register')({
+  stage: 1
 });
 
-// Server
-require("./build/server")
+// Server.
+require('./build/server/index');
