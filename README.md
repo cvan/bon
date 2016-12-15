@@ -21,6 +21,11 @@ npm start
 ```
 
 
+## Credits
+
+Adapted from [riot-isomorphic](https://github.com/ListnPlay/riot-isomorphic).
+
+
 ## License
 
 [MIT](LICENSE.md)
